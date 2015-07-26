@@ -45,7 +45,18 @@ class HttpCacheSupportMiddleware
          */
         $response = $next($request);
 
-        if ($this->addCachingHeader && in_array($request->method(), ['GET', 'HEAD'])) {
+        /**
+         * Never cache AJAX responses
+         */
+        if ($request->ajax()) {
+            return $response;
+        }
+
+        /**
+         * Add header for HTTP cache if request is reading (GET, HEAD, OPTION)
+         * and current page is defined as public
+         */
+        if ($this->addCachingHeader && in_array($request->method(), ['GET', 'HEAD', 'OPTIONS'])) {
             $response->header('X-Cacheable-Page', 'true');
         }
 
